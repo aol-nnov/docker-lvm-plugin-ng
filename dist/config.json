@@ -1,0 +1,42 @@
+{
+  "Description": "LVM volume plugin for Docker",
+  "Documentation": "https://docs.docker.com/engine/extend/plugins_volume/",
+  "Entrypoint": ["/docker-lvm-plugin", "-debug"],
+  "Env": [
+    {
+      "Name": "DEFAULT_VOLUME_GROUP",
+      "Description": "default LVM volume group to create volumes in.",
+      "Settable": ["value"],
+      "Value": null
+    },
+    {
+      "Name": "RECOVERY",
+      "Description": "reconvery mode - do not create lvm volumes, only plugin metadata",
+      "Settable": ["value"],
+      "Value": "false"
+    }
+  ],
+  "Interface": {
+    "Socket": "lvm.sock",
+    "Types": ["docker.volumedriver/1.0"]
+  },
+  "Linux": {
+    "Capabilities": ["CAP_SYS_ADMIN"],
+    "AllowAllDevices": true,
+    "Devices": null
+  },
+  "Mounts": [
+    {
+      "description": "Device access for devicemapper (/dev/mapper/*, /dev/*/*)",
+      "destination": "/dev",
+      "options": ["rbind"],
+      "name": "dev",
+      "source": "/dev",
+      "type": "bind"
+    }
+  ],
+  "Network": {
+    "Type": "none"
+  },
+  "PropagatedMount": "/var/lib/docker-lvm-plugin"
+}
