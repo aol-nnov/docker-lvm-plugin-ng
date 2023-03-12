@@ -19,7 +19,7 @@ func (l *localLvmStoragePlugin) Mount(req *volume.MountRequest) (*volume.MountRe
 
 	isSnap := func() bool {
 		if v, ok := l.volumes[req.Name]; ok {
-			return v.SnapSource != ""
+			return v.Origin != ""
 		}
 		return false
 	}()

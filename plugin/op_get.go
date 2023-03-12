@@ -21,7 +21,7 @@ func (l *localLvmStoragePlugin) Get(req *volume.GetRequest) (*volume.GetResponse
 		return &volume.GetResponse{}, fmt.Errorf("No such volume '%s'", req.Name)
 	}
 
-	createdAt, err := lvm.GetVolumeCreationDateTime(v.Vg, v.Name)
+	vi, err := lvm.GetVolumeInfo(v.Vg, v.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (l *localLvmStoragePlugin) Get(req *volume.GetRequest) (*volume.GetResponse
 	res.Volume = &volume.Volume{
 		Name:       v.Name,
 		Mountpoint: v.MountPoint,
-		CreatedAt:  fmt.Sprintf(createdAt.Format(time.RFC3339)),
+		CreatedAt:  vi[0].Created.Format(time.RFC3339),
 	}
 	return &res, nil
 }

@@ -24,7 +24,7 @@ func (l *localLvmStoragePlugin) Remove(req *volume.RemoveRequest) error {
 			if volName == req.Name {
 				continue
 			}
-			if vol.Type == "Snapshot" && vol.Source == req.Name {
+			if vol.Origin == req.Name {
 				return true
 			}
 		}

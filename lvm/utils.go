@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
-	"strings"
-	"time"
 )
 
 func IsThinlyProvisioned(vg, lv string) (bool, string, error) {
@@ -27,18 +25,6 @@ func RemoveLogicalVolume(vg string, lv string) ([]byte, error) {
 
 func LogicalDevice(vgName, lvName string) string {
 	return fmt.Sprintf("/dev/%s/%s", vgName, lvName)
-}
-
-func GetVolumeCreationDateTime(vg, lv string) (time.Time, error) {
-	_, creationDateTime, err := lvdisplayGrep(vg, lv, "LV Creation host")
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	// creationDateTime is in the form "LV Creation host, time localhost, 2018-11-18 13:46:08 -0100"
-	tokens := strings.Split(creationDateTime, ",")
-	date := strings.TrimSpace(tokens[len(tokens)-1])
-	return time.Parse("2006-01-02 15:04:05 -0700", date)
 }
 
 func lvdisplayGrep(vgName, lvName, keyword string) (bool, string, error) {

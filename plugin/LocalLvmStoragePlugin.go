@@ -10,10 +10,8 @@ type vol struct {
 	MountPoint string `json:"mountpoint"`
 	Vg         string `json:"vg"`
 	Thinpool   string `json:"thinpool"`
-	//Type       string `json:"type,omitempty"`
-	//Source     string `json:"source,omitempty"`
-	SnapSource string `json:"snap_source,omitempty"`
-	Count      int    `json:"count"`
+	Origin string `json:"snap_source,omitempty"`
+	Count  int    `json:"count"`
 }
 
 type localLvmStoragePlugin struct {

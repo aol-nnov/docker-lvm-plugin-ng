@@ -26,4 +26,4 @@ push: create
 	@docker plugin push ${PLUGIN_NAME}:${PLUGIN_TAG}-${DISTRO}
 
 clean:
-	rm -rf ./dist/rootfs
+	rm -rf ./dist/rootfs ./docker-lvm-plugin-ng

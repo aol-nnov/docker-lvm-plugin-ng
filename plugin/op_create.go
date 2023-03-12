@@ -63,7 +63,7 @@ func (l *localLvmStoragePlugin) Create(req *volume.CreateRequest) (err error) {
 		}
 		cmdArgs = append(cmdArgs, vgName+"/"+snap)
 
-		v.SnapSource = snap
+		v.Origin = snap
 
 	} else if thin, ok := req.Options["thinpool"]; ok && thin != "" {
 		v.Thinpool = thin
