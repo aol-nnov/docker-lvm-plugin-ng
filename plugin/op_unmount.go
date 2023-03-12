@@ -14,7 +14,7 @@ func (l *localLvmStoragePlugin) Unmount(req *volume.UnmountRequest) error {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	if l.volumes[req.Name].Count == 1 {
+	if l.volumes[req.Name].RefCount == 1 {
 		mp := getMountpoint(req.Name)
 
 		isVolMounted, err := mountinfo.Mounted(mp)
@@ -28,9 +28,9 @@ func (l *localLvmStoragePlugin) Unmount(req *volume.UnmountRequest) error {
 			}
 		}
 	}
-	l.volumes[req.Name].Count--
-	if err := saveToDisk(l.volumes); err != nil {
-		return err
-	}
+	l.volumes[req.Name].RefCount--
+	//if err := saveToDisk(l.volumes); err != nil {
+	//	return err
+	//}
 	return nil
 }

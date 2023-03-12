@@ -21,16 +21,20 @@ func (l *localLvmStoragePlugin) Get(req *volume.GetRequest) (*volume.GetResponse
 		return &volume.GetResponse{}, fmt.Errorf("No such volume '%s'", req.Name)
 	}
 
-	vi, err := lvm.GetVolumeInfo(v.Vg, v.Name)
+	vi, err := lvm.GetVolumeInfo(v.Vg, req.Name)
 	if err != nil {
 		return nil, err
 	}
 
+	statusMap := vi[0].Map()
+	statusMap["RefCount"] = v.RefCount
+
 	var res volume.GetResponse
 	res.Volume = &volume.Volume{
-		Name:       v.Name,
-		Mountpoint: v.MountPoint,
+		Name:       req.Name,
+		Mountpoint: getMountpoint(req.Name),
 		CreatedAt:  vi[0].Created.Format(time.RFC3339),
+		Status:     statusMap,
 	}
 	return &res, nil
 }

@@ -22,48 +22,47 @@ func (l *localLvmStoragePlugin) Create(req *volume.CreateRequest) (err error) {
 	}
 
 	cmdArgs := []string{"-y", "-n", req.Name, "--setactivationskip", "n"}
-	snap, ok := req.Options["snapshot"]
-	isSnapshot := ok && snap != ""
-	isThinSnap := false
 
-	moutpoint, err := provisionMoutpoint(req.Name)
+	snapshotOrigin, ok := req.Options["snapshot"]
+	isSnapshot := ok && snapshotOrigin != ""
 
-	if err != nil {
+	//snapshotOriginVol, ok := l.volumes[snapshotOrigin]
+	//isThinSnap := ok && snapshotOriginVol.Thinpool != ""
+
+	if err = provisionMoutpoint(req.Name); err != nil {
 		return
 	}
 
-
 	v := &vol{
-		Name:       req.Name,
-		MountPoint: moutpoint,
-		Vg:         vgName,
-		Count:      0,
+		Vg:       vgName,
+		RefCount: 0,
 	}
 
-	if isSnapshot {
-		if isThinSnap, _, err = lvm.IsThinlyProvisioned(vgName, snap); err != nil {
-			return fmt.Errorf("Error creating volume")
-		}
-	}
+	//if isSnapshot {
+	//	if isThinSnap, _, err = lvm.IsThinlyProvisioned(vgName, snapshotOrigin); err != nil {
+	//		return fmt.Errorf("Error creating volume")
+	//	}
+	//}
+
 	size, ok := req.Options["size"]
 	hasSize := ok && size != ""
 
-	if !hasSize && !isThinSnap {
-		return fmt.Errorf("Please specify a size with --opt size=")
-	}
-
-	if hasSize && isThinSnap {
-		return fmt.Errorf("Please don't specify --opt size= for thin snapshots")
-	}
+	//if !hasSize && !isThinSnap {
+	//	return fmt.Errorf("Please specify a size with --opt size=")
+	//}
+	//
+	//if hasSize && isThinSnap {
+	//	return fmt.Errorf("Please don't specify --opt size= for thin snapshots")
+	//}
 
 	if isSnapshot {
 		cmdArgs = append(cmdArgs, "--snapshot")
 		if hasSize {
 			cmdArgs = append(cmdArgs, "--size", size)
 		}
-		cmdArgs = append(cmdArgs, vgName+"/"+snap)
+		cmdArgs = append(cmdArgs, vgName+"/"+snapshotOrigin)
 
-		v.Origin = snap
+		v.Origin = snapshotOrigin
 
 	} else if thin, ok := req.Options["thinpool"]; ok && thin != "" {
 		v.Thinpool = thin
@@ -72,7 +71,7 @@ func (l *localLvmStoragePlugin) Create(req *volume.CreateRequest) (err error) {
 			"--thin", vgName+"/"+thin,
 		)
 	} else {
-		cmdArgs = append(cmdArgs, "--size", size, vgName)
+		cmdArgs = append(cmdArgs, "-Zn", "--size", size, vgName)
 	}
 
 	log.Printf("lvcreate %+q", cmdArgs)
@@ -84,20 +83,20 @@ func (l *localLvmStoragePlugin) Create(req *volume.CreateRequest) (err error) {
 
 	defer func() {
 		if err != nil {
-			lvm.RemoveLogicalVolume(req.Name, vgName)
+			lvm.RemoveLogicalVolume(vgName, req.Name)
 		}
 	}()
 
 	if !isSnapshot {
 		device := lvm.LogicalDevice(vgName, req.Name)
 
-		cmd = exec.Command("mkfs.xfs", device)
+		cmd = exec.Command("mkfs.xfs", "-f", device)
 		if out, err := cmd.CombinedOutput(); err != nil {
 			return fmt.Errorf("Create: mkfs.xfs error: %s output %s", err, string(out))
 		}
 	}
 
-	l.volumes[v.Name] = v
+	l.volumes[req.Name] = v
 
 	err = saveToDisk(l.volumes)
 

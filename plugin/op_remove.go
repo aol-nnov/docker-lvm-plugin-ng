@@ -19,7 +19,7 @@ func (l *localLvmStoragePlugin) Remove(req *volume.RemoveRequest) error {
 		return fmt.Errorf("remove: No such volume '%s'", req.Name)
 	}
 
-	isOrigin := func() bool {
+	hasSnapshots := func() bool {
 		for volName, vol := range l.volumes {
 			if volName == req.Name {
 				continue
@@ -31,21 +31,22 @@ func (l *localLvmStoragePlugin) Remove(req *volume.RemoveRequest) error {
 		return false
 	}()
 
-	if isOrigin {
-		return fmt.Errorf("Error removing volume, all snapshot destinations must be removed before removing the original volume")
+	if hasSnapshots {
+		return fmt.Errorf("Error removing volume. All volume snapshots must be removed before removing the original volume")
 	}
 
 	if err := os.RemoveAll(getMountpoint(req.Name)); err != nil {
 		return err
 	}
 
-	if out, err := lvm.RemoveLogicalVolume(v.Vg, req.Name); err != nil {
-		return fmt.Errorf("Remove: removeLogicalVolume error %s output %s", err, string(out))
+	if err := lvm.RemoveLogicalVolume(v.Vg, req.Name); err != nil {
+		return fmt.Errorf("Unable to remove LV '%s/%s", v.Vg, req.Name)
 	}
 
 	delete(l.volumes, req.Name)
 	if err := saveToDisk(l.volumes); err != nil {
 		return err
 	}
+
 	return nil
 }

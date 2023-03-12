@@ -6,12 +6,10 @@ import (
 )
 
 type vol struct {
-	Name       string `json:"name"`
-	MountPoint string `json:"mountpoint"`
-	Vg         string `json:"vg"`
-	Thinpool   string `json:"thinpool"`
-	Origin string `json:"snap_source,omitempty"`
-	Count  int    `json:"count"`
+	Vg       string `json:"vg"`
+	Thinpool string `json:"thinpool"`
+	Origin   string `json:"snap_source,omitempty"`
+	RefCount int    `json:"-"`
 }
 
 type localLvmStoragePlugin struct {

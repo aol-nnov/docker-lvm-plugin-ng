@@ -53,3 +53,18 @@ func (v *Volume) String() string {
 		v.CreatedHost,
 	)
 }
+
+func (v *Volume) Map() map[string]interface{} {
+	return map[string]interface{}{
+		"FullName":    v.FullName,
+		"Size":        v.Size,
+		"DataUsed%":   v.Used,
+		"MetaUsed%":   v.UsedMeta,
+		"Vg":          v.Vg,
+		"DevPath":     v.DevPath,
+		"Attributes":  v.Attributes.Map(),
+		"ThinPool":    v.ThinPool,
+		"Origin":      v.Origin,
+		"CreatedHost": v.CreatedHost,
+	}
+}

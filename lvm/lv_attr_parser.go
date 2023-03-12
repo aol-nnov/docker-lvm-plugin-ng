@@ -4,12 +4,14 @@ import (
 	"fmt"
 )
 
+// https://man7.org/linux/man-pages/man8/lvs.8.html
+
 /**
 Позоции атрибутов в сырой строке 'Vwi-a-tz--'
 в нулевой позиции - кавычки. см. комментарий в UnmarshalJSON
 */
 const (
-	attrPosVolumeType = 1
+	attrPosVolumeType int = iota + 1
 	attrPosPermissions
 	attrPosAllocPolicy
 	attrPosFixedMinor
@@ -150,4 +152,21 @@ func (attrs *LvAttributes) UnmarshalJSON(raw []byte) error {
 	}
 
 	return nil
+}
+
+func (attrs *LvAttributes) Map() map[string]interface{} {
+	return map[string]interface{}{
+		"Volume type":       attrs.VolumeType.String(),
+		"Permissions":       attrs.Permissions.String(),
+		"Allocation policy": attrs.AllocPolicy.String(),
+		"Fixed minor":       attrs.FixedMinor,
+		"State":             attrs.State.String(),
+		"Device":            attrs.Device.String(),
+		"Target type":       attrs.TargetType.String(),
+		"Newly-allocated data blocks are zeroed before use": attrs.ZeroNewBlocksOnAlloc,
+		"Health":          attrs.Health.String(),
+		"Skip activation": attrs.SkipActivation,
+		//"raw":             attrs.Raw,
+	}
+
 }

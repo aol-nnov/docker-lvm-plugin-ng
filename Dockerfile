@@ -5,7 +5,7 @@ ENV GO111MODULE on
 
 COPY . /build
 WORKDIR /build
-RUN go generate docker-lvm-plugin-ng/lvm
+RUN go generate ./lvm
 RUN go build -o /docker-lvm-plugin
 
 FROM debian:${DISTRO}-slim

@@ -29,16 +29,16 @@ func getVgName(name string) (string, error) {
 	return vgName, nil
 }
 
-func provisionMoutpoint(volName string) (string, error) {
+func provisionMoutpoint(volName string)  error {
 	mountPoint := getMountpoint(volName)
 
 	err := os.MkdirAll(mountPoint, 0700)
 	if err != nil {
 		os.RemoveAll(mountPoint)
-		return "", err
+		return err
 	}
 
-	return mountPoint, nil
+	return nil
 }
 
 func getMountpoint(volName string) string {
