@@ -3,9 +3,10 @@ package plugin
 import (
 	"docker-lvm-plugin-ng/lvm"
 	"fmt"
-	"github.com/docker/go-plugins-helpers/volume"
 	"log"
 	"os/exec"
+
+	"github.com/docker/go-plugins-helpers/volume"
 )
 
 func (l *localLvmStoragePlugin) Create(req *volume.CreateRequest) (err error) {
@@ -90,7 +91,13 @@ func (l *localLvmStoragePlugin) Create(req *volume.CreateRequest) (err error) {
 	if !isSnapshot {
 		device := lvm.LogicalDevice(vgName, req.Name)
 
-		cmd = exec.Command("mkfs.xfs", "-f", device)
+		mkfsCmdArgs := []string{
+			"-f",
+			"-m", "bigtime=1",
+			device,
+		}
+
+		cmd = exec.Command("mkfs.xfs", mkfsCmdArgs...)
 		if out, err := cmd.CombinedOutput(); err != nil {
 			return fmt.Errorf("Create: mkfs.xfs error: %s output %s", err, string(out))
 		}
