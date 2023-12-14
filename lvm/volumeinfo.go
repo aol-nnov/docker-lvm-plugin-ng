@@ -33,6 +33,10 @@ func GetVolumeInfo(args ...string) ([]Volume, error) {
 		err = json.NewDecoder(pipe).Decode(&parsedResponse)
 	}
 
+	if err := cmd.Wait(); err != nil {
+		return nil, err
+	}
+
 	if len(parsedResponse.Reports[0].Lvs) < 1 {
 		return nil, fmt.Errorf("GetVolumeInfo: Results parsing failed or volume not found. Error: %v", err)
 	}
