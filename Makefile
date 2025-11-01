@@ -1,7 +1,7 @@
 PLUGIN_NAME = i13n/docker-lvm
 DISTRO ?= bullseye
 PLUGIN_TAG ?= $(DISTRO)
-ALLSRC = $(wildcard *.go) $(wildcard plugin/*.go) $(wildcard lvm/*.go)
+ALLSRC = $(wildcard *.go) $(wildcard plugin/*.go) $(wildcard lvm/*.go) docker-lvm-plugin.go
 
 all: create
 
@@ -27,4 +27,4 @@ push: create
 	@docker plugin push ${PLUGIN_NAME}:${PLUGIN_TAG}
 
 clean:
-	rm -rf ./dist/rootfs ./docker-lvm-plugin-ng
+	rm -rf ./lvm/*_string.go ./dist/rootfs ./docker-lvm-plugin-ng

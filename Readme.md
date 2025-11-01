@@ -1,9 +1,31 @@
-* https://habr.com/ru/sandbox/75858/
-* https://habr.com/ru/articles/67283/
-* http://xgu.ru/wiki/LVM
-* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/logical_volume_manager_administration/thinly_provisioned_snapshot_creation
-* https://www.tecmint.com/take-snapshot-of-logical-volume-and-restore-in-lvm/
-* https://docs.docker.com/engine/extend/plugins_volume/
-* https://docs.docker.com/engine/extend/ (Using curl to debug plugin socket issues)
+# Docker lvm volume driver
 
-docker plugin enable --timeout 300 i13n/docker-lvm:bullseye 
+Highly inspired by @nickbreen's [docker-lvm-plugin](https://github.com/nickbreen/docker-lvm-plugin)
+
+Though, it is used in production for 6+ years by now, use it with agrain of salt, you've been warned ))
+
+For plugin to work correctly, it is recommended to add `--timeout` parameter to the corresponding
+`docker plugin enable` command, i.e.:
+
+```
+docker plugin enable --timeout 300 <your_plugin_name>
+```
+
+## Building
+
+```
+make
+```
+
+## Usage
+
+(somewhere in docker-compose.yml)
+
+```yml
+volumes:
+  grafana-config:
+    driver: "<your_plugin_name>"
+    driver_opts:
+      thinpool: data
+      size: 100M
+```

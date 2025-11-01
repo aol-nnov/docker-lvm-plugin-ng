@@ -8,6 +8,7 @@ import (
 type LvmResponse struct {
 	Reports []Report `json:"report"`
 }
+
 type Report struct {
 	Lvs []Volume `json:"lv"`
 }
